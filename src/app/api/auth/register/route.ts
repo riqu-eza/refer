@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import argon2 from "argon2";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
 import { generateReferralCode } from "@/src/lib/shared/referral";
@@ -12,13 +12,17 @@ export async function POST(req: Request) {
 
   const { name, email, phone, password, referral } = await req.json();
 
+  // Check if user already exists
   const exists = await User.findOne({ phone });
   if (exists)
     return NextResponse.json({ error: "User exists" }, { status: 400 });
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  // Hash password with Argon2
+  const passwordHash = await argon2.hash(password);
+
   const referralCode = generateReferralCode(phone);
 
+  // Create user
   const user = await User.create({
     name,
     email,
@@ -28,7 +32,7 @@ export async function POST(req: Request) {
     referredBy: referral || null,
   });
 
-  // JOSE JWT
+  // Create JWT using JOSE
   const token = await signToken({ id: user._id.toString() });
 
   const res = NextResponse.json({
@@ -36,6 +40,7 @@ export async function POST(req: Request) {
     user,
   });
 
+  // Set secure session cookie
   res.cookies.set("session_token", token, {
     httpOnly: true,
     secure: true,

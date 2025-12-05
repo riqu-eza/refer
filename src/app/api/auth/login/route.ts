@@ -1,11 +1,10 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
 import { signToken } from "@/src/lib/jwt";
-
+import argon2 from "argon2";
 export async function POST(req: Request) {
   await connectDB();
 
@@ -15,7 +14,7 @@ export async function POST(req: Request) {
   if (!user)
     return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const ok = await bcrypt.compare(password, user.passwordHash);
+  const ok = await argon2.verify(password, user.passwordHash);
   if (!ok)
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 
