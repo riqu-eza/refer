@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-export const runtime = "nodejs";   // ← REQUIRED FIX
+// export const runtime = "nodejs";   // ← REQUIRED FIX
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("session_token")?.value;

@@ -6,7 +6,7 @@ export interface ITransaction extends Document {
   amount: number;
   currency: "FIAT" | "POINTS";
   status: "PENDING" | "SUCCESS" | "FAILED";
-  meta?: any;
+  meta?: Record<string, unknown>;
   createdAt: Date;
 }
 
@@ -16,7 +16,7 @@ const TransactionSchema = new Schema<ITransaction>({
   amount: { type: Number, required: true },
   currency: { type: String, enum: ["FIAT", "POINTS"], required: true },
   status: { type: String, enum: ["PENDING", "SUCCESS", "FAILED"], default: "PENDING" },
-  meta: { type: Object },
+  meta: { type: Schema.Types.Mixed, default: {} },
 
   createdAt: { type: Date, default: Date.now }
 });

@@ -20,7 +20,7 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
-    let decoded;
+    let decoded: string | jwt.JwtPayload | undefined;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET!);
       console.log("🔓 JWT Decoded:", decoded);
@@ -29,8 +29,16 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
+    // Ensure decoded is an object with an 'id' property
+    if (typeof decoded === "string" || decoded == null || !("id" in decoded)) {
+      console.error("❌ Invalid token payload, missing id:", decoded);
+      return NextResponse.json({ user: null });
+    }
+
+    const payload = decoded as jwt.JwtPayload;
+
     await connectDB();
-    console.log("📌 Looking for user:", decoded.id);
+    console.log("📌 Looking for user:", payload.id);
 
     const user = await User.findById(decoded.id).lean();
     console.log("👤 User found:", user);

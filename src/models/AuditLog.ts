@@ -5,7 +5,7 @@ export interface IAuditLog extends Document {
   entity: string;
   entityId: string;
   action: string;
-  details?: any;
+  details?: Record<string, unknown>;
   createdAt: Date;
 }
 
@@ -14,7 +14,7 @@ const AuditLogSchema = new Schema<IAuditLog>({
   entity: { type: String, required: true },
   entityId: { type: String, required: true },
   action: { type: String, required: true },
-  details: { type: Object },
+  details: { type: Schema.Types.Mixed },
 
   createdAt: { type: Date, default: Date.now }
 });

@@ -5,7 +5,7 @@ export interface IWithdrawal extends Document {
   amount: number;
   method: string;
   status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
-  meta?: any;
+  meta?: Record<string, unknown>;
   createdAt: Date;
   completedAt?: Date;
 }
@@ -15,7 +15,7 @@ const WithdrawalSchema = new Schema<IWithdrawal>({
   amount: { type: Number, required: true },
   method: { type: String, required: true },
   status: { type: String, enum: ["PENDING", "PROCESSING", "COMPLETED", "FAILED"], default: "PENDING" },
-  meta: { type: Object },
+  meta: { type: Schema.Types.Mixed },
 
   createdAt: { type: Date, default: Date.now },
   completedAt: { type: Date }
