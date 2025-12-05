@@ -1,10 +1,11 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
 
-export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   await connectDB();

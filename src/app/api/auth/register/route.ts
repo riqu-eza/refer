@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -6,7 +8,6 @@ import User from "@/src/models/User";
 import { generateReferralCode } from "@/src/lib/shared/referral";
 import { truncate } from "node:fs/promises";
 
-export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   await connectDB();

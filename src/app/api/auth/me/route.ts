@@ -1,10 +1,11 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
 
-export const runtime = "nodejs";
 
 export async function GET() {
   console.log("➡️ /api/auth/me called");
