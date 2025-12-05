@@ -2,10 +2,9 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
-
+import { signToken } from "@/src/lib/jwt";
 
 export async function POST(req: Request) {
   await connectDB();
@@ -20,11 +19,8 @@ export async function POST(req: Request) {
   if (!ok)
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 
-  const token = jwt.sign(
-    { id: user._id.toString() },
-    process.env.JWT_SECRET!,
-    { expiresIn: "7d" }
-  );
+  // JOSE JWT
+  const token = await signToken({ id: user._id.toString() });
 
   const res = NextResponse.json({
     message: "Logged in",

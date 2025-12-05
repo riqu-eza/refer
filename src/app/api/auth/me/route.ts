@@ -2,10 +2,9 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
-
+import { verifyToken } from "@/src/lib/jwt";
 
 export async function GET() {
   console.log("➡️ /api/auth/me called");
@@ -14,39 +13,29 @@ export async function GET() {
     const cookieStore = await cookies();
     const token = cookieStore.get("session_token")?.value;
 
-    console.log("🍪 Token from cookies:", token ? "FOUND" : "NOT FOUND");
+    console.log("🍪 Token:", token ? "FOUND" : "NOT FOUND");
 
-    if (!token) {
-      console.log("❌ No token → returning null user");
-      return NextResponse.json({ user: null });
-    }
+    if (!token) return NextResponse.json({ user: null });
 
-    let decoded: string | jwt.JwtPayload | undefined;
+    let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      console.log("🔓 JWT Decoded:", decoded);
+      decoded = await verifyToken(token);
+      console.log("🔓 JWT Decoded:", decoded.payload);
     } catch (err) {
       console.error("❌ JWT VERIFY FAILED:", err);
       return NextResponse.json({ user: null });
     }
 
-    // Ensure decoded is an object with an 'id' property
-    if (typeof decoded === "string" || decoded == null || !("id" in decoded)) {
-      console.error("❌ Invalid token payload, missing id:", decoded);
-      return NextResponse.json({ user: null });
-    }
-
-    const payload = decoded as jwt.JwtPayload;
+    const id = decoded.payload.id;
+    if (!id) return NextResponse.json({ user: null });
 
     await connectDB();
-    console.log("📌 Looking for user:", payload.id);
-
-    const user = await User.findById(decoded.id).lean();
-    console.log("👤 User found:", user);
+    const user = await User.findById(id).lean();
 
     return NextResponse.json({
       user: user ? { ...user, passwordHash: undefined } : null,
     });
+
   } catch (err) {
     console.error("🔥 ERROR IN /api/auth/me:", err);
     return NextResponse.json({ user: null });
