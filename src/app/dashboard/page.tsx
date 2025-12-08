@@ -45,8 +45,8 @@ export default function DashboardPage() {
       const res = await fetch(`/api/wallet/${user._id}`);
       const data = await res.json();
       setBalance({
-        fiat: data.fiatBalance,
-        points: data.pointsBalance,
+        fiat: data.fiatBalance ?? 0,
+        points: data.pointsBalance ?? 0,
       });
       console.log("Wallet data loaded:", data);
     }
