@@ -29,6 +29,29 @@ export default function ActivationPopup({ user }: ActivationPopupProps) {
     
     return () => clearInterval(interval);
   }, []);
+useEffect(() => {
+  if (activeStep === 3 && msg.includes("sent")) {
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/wallet/${user._id}`);
+        const data = await res.json();
+        if (data.isActivated) {
+          setMsg("Payment successful! Account activated.");
+          clearInterval(interval);
+          // Optionally close the popup after a delay
+          setTimeout(() => {
+            const popup = document.getElementById('activation-popup');
+            if (popup) popup.style.display = 'none';
+          }, 1500);
+        }
+      } catch (err) {
+        console.error("Error fetching user status", err);
+      }
+    }, 3000); // every 3 seconds
+
+    return () => clearInterval(interval);
+  }
+}, [activeStep, msg, user._id]);
 
   const handleSubmit = async () => {
     setLoading(true);

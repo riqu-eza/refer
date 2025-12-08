@@ -18,6 +18,7 @@ interface UserContextType {
   loading: boolean;
   login: (user: IUser) => void;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;   // <-- ADD THIS
 }
 
 const UserContext = createContext<UserContextType>({
@@ -25,41 +26,47 @@ const UserContext = createContext<UserContextType>({
   loading: true,
   login: () => {},
   logout: async () => {},
+  refreshUser: async () => {},         // <-- ADD THIS
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Initial load
   useEffect(() => {
-    async function load() {
-      console.log("➡️ UserContext: calling /api/auth/me");
+    loadUser();
+  }, []);
 
-      try {
-        const res = await fetch("/api/auth/me", {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        });
+  // Extracted into a function so we can reuse it
+  const loadUser = async () => {
+    console.log("➡️ UserContext: calling /api/auth/me");
 
-        console.log("📥 Response status:", res.status);
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+      });
 
-        const data = await res.json();
-        console.log("📡 /api/auth/me returned:", data);
+      console.log("📥 Response status:", res.status);
+      const data = await res.json();
 
-        setUser(data.user);
-      } catch (error) {
-        console.error("🔥 UserContext ERROR:", error);
-        setUser(null);
-      }
-
-      console.log("⬅️ Setting loading = false");
-      setLoading(false);
+      console.log("📡 /api/auth/me returned:", data);
+      setUser(data.user);
+    } catch (error) {
+      console.error("🔥 UserContext ERROR:", error);
+      setUser(null);
     }
 
-    load();
-  }, []);
+    setLoading(false);
+  };
+
+  // NEW: function to manually refresh user anytime
+  const refreshUser = async () => {
+    console.log("🔄 Refreshing user...");
+    await loadUser();
+  };
 
   const login = (userData: IUser) => {
     console.log("🔐 UserContext LOGIN:", userData);
@@ -74,7 +81,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout }}>
+    <UserContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        refreshUser,     // <-- EXPOSE IT HERE
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

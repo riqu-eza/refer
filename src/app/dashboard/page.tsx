@@ -42,9 +42,13 @@ export default function DashboardPage() {
     async function loadBalance() {
       if (!user) return;
 
-      const res = await fetch("/api/wallet/balance");
+      const res = await fetch(`/api/wallet/${user._id}`);
       const data = await res.json();
-      setBalance(data);
+      setBalance({
+        fiat: data.fiatBalance,
+        points: data.pointsBalance,
+      });
+      console.log("Wallet data loaded:", data);
     }
     loadBalance();
   }, [user]);
@@ -240,7 +244,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Hologram Scan */}
-              <div className="mt-6 pt-4 border-t border-cyan-500/20">
+              {/* <div className="mt-6 pt-4 border-t border-cyan-500/20">
                 <div className="flex justify-between text-xs text-cyan-400/70 font-mono">
                   <span>SYSTEM_INTEGRITY_SCAN</span>
                   <span>{hologramScan}%</span>
@@ -252,7 +256,7 @@ export default function DashboardPage() {
                     transition={{ duration: 0.5 }}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           </motion.div>
 
@@ -297,74 +301,84 @@ export default function DashboardPage() {
             />
           </motion.div>
 
-          {/* Daily Spin CTA */}
+                    {/* Daily Spin CTA - Mobile Optimized */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="relative overflow-hidden rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-600/10 to-amber-600/10 backdrop-blur-sm p-6"
+            className="relative overflow-hidden rounded-2xl border border-yellow-500/30 bg-gradient-to-br from-yellow-600/10 to-amber-600/10 backdrop-blur-sm p-4 sm:p-6"
           >
-            {/* Anime Sparkles */}
-            <div className="absolute top-4 right-4">
-              <Sparkles className="w-8 h-8 text-yellow-400/50 animate-pulse" />
+            {/* Anime Sparkles - Mobile responsive */}
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400/50 animate-pulse" />
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 flex items-center justify-center">
-                <Target className="w-7 h-7 text-yellow-400" />
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+                <Target className="w-5 h-5 sm:w-7 sm:h-7 text-yellow-400" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-yellow-300">DAILY_REWARDS_LOCKED</h3>
-                <p className="text-sm text-yellow-400/70">Claim your energy boost now</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm sm:text-lg font-bold text-yellow-300 truncate">
+                  DAILY_REWARDS
+                </h3>
+                <p className="text-xs sm:text-sm text-yellow-400/70 truncate">
+                  Claim your energy boost now
+                </p>
               </div>
               <a
                 href="/spin"
-                className="px-6 py-3 bg-gradient-to-r from-yellow-600 to-amber-600 text-white font-bold rounded-lg hover:from-yellow-500 hover:to-amber-500 transition-all group relative overflow-hidden"
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-yellow-600 to-amber-600 text-white font-bold rounded-lg hover:from-yellow-500 hover:to-amber-500 transition-all group relative overflow-hidden whitespace-nowrap text-sm sm:text-base"
               >
-                <span className="relative">ACTIVATE_SPIN</span>
+                <span className="relative">SPIN NOW</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/20 to-yellow-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               </a>
             </div>
           </motion.div>
 
-          {/* Tasks Section */}
+                   {/* Tasks Section - Mobile Optimized */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white flex items-center space-x-3">
-                <div className="w-2 h-8 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full"></div>
-                <span>MISSION_QUEUE</span>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                <div className="w-1.5 h-5 sm:w-2 sm:h-6 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full flex-shrink-0"></div>
+                <span className="whitespace-nowrap">MISSION_QUEUE</span>
               </h3>
-              <a href="/tasks" className="text-sm text-cyan-400 hover:text-cyan-300 font-mono transition-colors">
+              <a 
+                href="/tasks" 
+                className="text-xs text-cyan-400 hover:text-cyan-300 font-mono transition-colors whitespace-nowrap flex-shrink-0 ml-2"
+              >
                 VIEW_ALL →
               </a>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <TaskCard
-                title="NEURAL_NETWORK_TRAINING"
+                title="NEURAL_TRAINING"
                 subtitle="Watch YouTube Ad"
-                reward="20 ENERGY_POINTS"
+                reward="20 POINTS"
                 rewardColor="text-cyan-400"
-                icon={<div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></div>}
+                icon={<div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse flex-shrink-0"></div>}
+                mobile
               />
               <TaskCard
-                title="DATA_SURVEY_COLLECTION"
+                title="DATA_SURVEY"
                 subtitle="Take Quick Survey"
                 reward="KSH 15"
                 rewardColor="text-green-400"
-                icon={<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>}
+                icon={<div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>}
+                mobile
               />
               <TaskCard
-                title="APP_INTEGRATION_TEST"
-                subtitle="Download App Offer"
+                title="APP_TEST"
+                subtitle="Download App"
                 reward="KSH 30"
                 rewardColor="text-purple-400"
-                icon={<div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>}
+                icon={<div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse flex-shrink-0"></div>}
+                mobile
               />
             </div>
           </motion.div>
@@ -374,36 +388,42 @@ export default function DashboardPage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/10 to-green-600/10 backdrop-blur-sm p-6"
+            className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/10 to-green-600/10 backdrop-blur-sm p-4 sm:p-6"
           >
-            {/* Circuit Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div 
-                  key={i}
-                  className="absolute w-20 h-20 border border-emerald-500 rounded-full"
-                  style={{
-                    top: `${Math.random() * 100}%`,
-                    left: `${Math.random() * 100}%`,
-                    transform: `scale(${Math.random() * 0.5 + 0.5})`,
-                  }}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/30 flex items-center justify-center">
-                <Users className="w-7 h-7 text-emerald-400" />
+            {/* Circuit Pattern - Only on larger screens for performance */}
+            {!isClient || window.innerWidth >= 768 ? (
+              <div className="absolute inset-0 opacity-5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div 
+                    key={i}
+                    className="absolute w-20 h-20 border border-emerald-500 rounded-full"
+                    style={{
+                      top: `${Math.random() * 100}%`,
+                      left: `${Math.random() * 100}%`,
+                      transform: `scale(${Math.random() * 0.5 + 0.5})`,
+                    }}
+                  />
+                ))}
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-emerald-300">NETWORK_EXPANSION</h3>
-                <p className="text-sm text-emerald-400/70">Amplify your network rewards</p>
+            ) : null}
+
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                <Users className="w-5 h-5 sm:w-7 sm:h-7 text-emerald-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm sm:text-lg font-bold text-emerald-300 truncate">
+                  NETWORK_EXPANSION
+                </h3>
+                <p className="text-xs sm:text-sm text-emerald-400/70 truncate">
+                  Amplify your network rewards
+                </p>
               </div>
               <a
                 href="/referrals"
-                className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-lg hover:from-emerald-500 hover:to-green-500 transition-all group relative overflow-hidden"
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-lg hover:from-emerald-500 hover:to-green-500 transition-all group relative overflow-hidden whitespace-nowrap text-sm sm:text-base"
               >
-                <span className="relative">INVITE_NODES</span>
+                <span className="relative">INVITE</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/20 to-emerald-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               </a>
             </div>
