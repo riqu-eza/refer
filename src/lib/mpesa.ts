@@ -1,7 +1,10 @@
 
 
 export const mpesaConfig = {
-  baseURL: "https://sandbox.safaricom.co.ke",
+   baseURL:
+    process.env.MPESA_ENV === "live"
+      ? "https://api.safaricom.co.ke"
+      : "https://sandbox.safaricom.co.ke",
   consumerKey: process.env.MPESA_CONSUMER_KEY!,
   consumerSecret: process.env.MPESA_CONSUMER_SECRET!,
   shortcode: process.env.MPESA_SHORTCODE!,

@@ -15,7 +15,7 @@ export const initiateStkPush = async (phoneNumber: string, amount: number) => {
     BusinessShortCode: mpesaConfig.shortcode,
     Password: password,
     Timestamp: timestamp,
-    TransactionType: "CustomerPayBillOnline",
+    TransactionType: "CustomerBuyGoodsOnline",
     Amount: amount.toString(),
     PartyA: formattedPhone,
     PartyB: mpesaConfig.tillNumber,

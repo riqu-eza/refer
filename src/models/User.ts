@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
-    name: string;
+  name: string;
   phone: string;
   email?: string;
   passwordHash: string;
@@ -13,10 +13,18 @@ export interface IUser extends Document {
 
   createdAt: Date;
   isActivated: boolean;
+  referralLevels: {
+    tier1: string[]; // direct referrals
+    tier2: string[];
+    tier3: string[];
+  };
+
+  xp: number;
+  level: number;
 }
 
 const UserSchema = new Schema<IUser>({
-    name: { type: String, required: true },
+  name: { type: String, required: true },
   phone: { type: String, unique: true, required: true },
   email: { type: String, unique: true, sparse: true },
   passwordHash: { type: String, required: true },
@@ -28,6 +36,14 @@ const UserSchema = new Schema<IUser>({
 
   createdAt: { type: Date, default: Date.now },
   isActivated: { type: Boolean, default: false },
+  referralLevels: {
+    tier1: { type: [String], default: [] },
+    tier2: { type: [String], default: [] },
+    tier3: { type: [String], default: [] },
+  },
+
+  xp: { type: Number, default: 0 },
+  level: { type: Number, default: 1 },
 });
 
 export default mongoose.models.User ||

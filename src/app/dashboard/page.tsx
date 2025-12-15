@@ -19,6 +19,7 @@ import {
   Bell,
   User
 } from "lucide-react";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { user, loading } = useUser();
@@ -325,13 +326,13 @@ export default function DashboardPage() {
                   Claim your energy boost now
                 </p>
               </div>
-              <a
+              <Link
                 href="/spin"
                 className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-yellow-600 to-amber-600 text-white font-bold rounded-lg hover:from-yellow-500 hover:to-amber-500 transition-all group relative overflow-hidden whitespace-nowrap text-sm sm:text-base"
               >
                 <span className="relative">SPIN NOW</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/20 to-yellow-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              </a>
+              </Link>
             </div>
           </motion.div>
 
