@@ -4,24 +4,26 @@ import Wallet from "@/src/models/Wallet";
 import Transaction from "@/src/models/Transaction";
 import UserSpinState from "@/src/models/UserSpinState";
 import { LEVEL_CONFIG } from "@/src/config/levels";
-import { getAllowedRewards, rollReward } from "@/src/services/spinRewardService";
+import {
+  getAllowedRewards,
+  rollReward,
+} from "@/src/services/spinRewardService";
 
 import { NextResponse } from "next/server";
 import { resetDailySpinsIfNeeded } from "@/src/services/resetSpin";
 import { verifyToken } from "@/src/lib/jwt";
 
 export async function POST(req: Request) {
-
   await connectDB();
 
   // ---- AUTH ----
   const cookie = req.headers.get("cookie") || "";
-console.log("[SPIN] Cookie header:", cookie);
+  console.log("[SPIN] Cookie header:", cookie);
   const token = cookie
     .split("; ")
     .find((c) => c.startsWith("session_token="))
     ?.split("=")[1];
-console.log("[SPIN] session_token:", token);
+  console.log("[SPIN] session_token:", token);
   if (!token) {
     console.warn("[SPIN] No auth_token found in cookie");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -30,9 +32,10 @@ console.log("[SPIN] session_token:", token);
   let userId: string;
 
   try {
-    const payload = await verifyToken(token);
+    const jwtResult = await verifyToken(token);
+    const payload = jwtResult.payload as { id: string };
     console.log("[SPIN] Token payload:", payload);
-    userId = payload.payload.id;
+    userId = payload.id;
     console.log("[SPIN] Token verified, userId:", userId);
   } catch (err) {
     console.error("[SPIN] Token verification failed", err);
@@ -145,4 +148,3 @@ console.log("[SPIN] session_token:", token);
       levelCfg.dailySpins - spinState.dailyUsedSpins + spinState.extraSpins,
   });
 }
-

@@ -1,3 +1,9 @@
+import { LEVEL_CONFIG } from "../config/levels";
+import Transaction from "../models/Transaction";
+import User from "../models/User";
+import UserSpinState from "../models/UserSpinState";
+import Wallet from "../models/Wallet";
+
 export async function buyExtraSpin(userId: string) {
   const user = await User.findById(userId);
   const wallet = await Wallet.findOne({ userId });
