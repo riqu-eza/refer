@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -16,11 +17,35 @@ export default function RegisterPage() {
   const [msg, setMsg] = useState("");
   const [activeField, setActiveField] = useState<string | null>(null);
   const [hologramProgress, setHologramProgress] = useState(0);
-  const [isClient, setIsClient] = useState(false); // Add this
+  const [isClient, setIsClient] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   useEffect(() => {
-    setIsClient(true); // Set to true only on client
+    setIsClient(true);
   }, []);
+
+  // Calculate password strength
+  useEffect(() => {
+    let strength = 0;
+    if (form.password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(form.password)) strength += 25;
+    if (/[0-9]/.test(form.password)) strength += 25;
+    if (/[^A-Za-z0-9]/.test(form.password)) strength += 25;
+    setPasswordStrength(strength);
+  }, [form.password]);
+
+  const getStrengthColor = (strength: number) => {
+    if (strength < 50) return "bg-red-500";
+    if (strength < 75) return "bg-yellow-500";
+    return "bg-green-500";
+  };
+
+  const getStrengthText = (strength: number) => {
+    if (strength < 50) return "Weak";
+    if (strength < 75) return "Fair";
+    return "Strong";
+  };
 
   // FIX: handle window only on client
   useEffect(() => {
@@ -55,9 +80,25 @@ export default function RegisterPage() {
     setLoading(true);
     setMsg("");
 
+    // Password validation
+    if (form.password.length < 8) {
+      setMsg("Password must be at least 8 characters long");
+      setLoading(false);
+      return;
+    }
+
+    if (passwordStrength < 50) {
+      setMsg("Please choose a stronger password");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(form),
       });
 
@@ -67,7 +108,9 @@ export default function RegisterPage() {
         setMsg(data.error || "Registration failed");
       } else {
         setMsg("Registration successful! Redirecting...");
-        window.location.href = "/dashboard";
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1500);
       }
     } catch (err) {
       setMsg("Something went wrong");
@@ -254,37 +297,86 @@ export default function RegisterPage() {
 
             {/* Password Field */}
             <div className="md:col-span-2 relative group">
-              <label className="block text-sm font-mono text-cyan-400 mb-2">
-                PASSWORD
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-mono text-cyan-400">
+                  PASSWORD
+                </label>
+                <div className="flex items-center gap-4">
+                  <span className={`text-xs font-mono ${
+                    passwordStrength < 50 ? "text-red-400" :
+                    passwordStrength < 75 ? "text-yellow-400" :
+                    "text-green-400"
+                  }`}>
+                    {getStrengthText(passwordStrength)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-mono flex items-center gap-1"
+                  >
+                    {showPassword ? (
+                      <>
+                        <FiEyeOff className="w-3 h-3" />
+                        HIDE
+                      </>
+                    ) : (
+                      <>
+                        <FiEye className="w-3 h-3" />
+                        SHOW
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+              
               <div className="relative">
                 <input
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={form.password}
                   onChange={handleChange}
                   onFocus={() => setActiveField("password")}
                   onBlur={() => setActiveField(null)}
-                  className="w-full p-3 bg-gray-900/50 border border-cyan-500/30 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                  className="w-full p-3 pr-12 bg-gray-900/50 border border-cyan-500/30 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                  placeholder="Enter secure password"
                 />
-                <div className="absolute right-3 top-3">
-                  <div className="flex space-x-1">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`w-1 h-3 rounded-full ${
-                          form.password.length >= i * 3
-                            ? "bg-cyan-500"
-                            : "bg-gray-600"
-                        }`}
-                      ></div>
-                    ))}
+                
+                {/* Password strength indicator bar */}
+                <div className="mt-3">
+                  <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${getStrengthColor(passwordStrength)} transition-all duration-300`}
+                      style={{ width: `${passwordStrength}%` }}
+                    />
                   </div>
+                  
+                  {/* Password requirements */}
+                  {/* {form.password && (
+                    <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-gray-400">
+                      <div className={`flex items-center gap-1 ${form.password.length >= 8 ? "text-green-400" : ""}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${form.password.length >= 8 ? "bg-green-500" : "bg-gray-600"}`} />
+                        Min. 8 characters
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[A-Z]/.test(form.password) ? "text-green-400" : ""}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(form.password) ? "bg-green-500" : "bg-gray-600"}`} />
+                        Uppercase letter
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[0-9]/.test(form.password) ? "text-green-400" : ""}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(form.password) ? "bg-green-500" : "bg-gray-600"}`} />
+                        Number
+                      </div>
+                      <div className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(form.password) ? "text-green-400" : ""}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${/[^A-Za-z0-9]/.test(form.password) ? "bg-green-500" : "bg-gray-600"}`} />
+                        Special character
+                      </div>
+                    </div>
+                  )} */}
                 </div>
-                {activeField === "password" && (
+                
+                {/* {activeField === "password" && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent"></div>
-                )}
+                )} */}
               </div>
             </div>
 
@@ -302,7 +394,15 @@ export default function RegisterPage() {
                   onFocus={() => setActiveField("referral")}
                   onBlur={() => setActiveField(null)}
                   className="w-full p-3 bg-gray-900/50 border border-cyan-500/30 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                  placeholder="Enter referral code if any"
                 />
+                {form.referral && (
+                  <div className="absolute right-3 top-3">
+                    <div className="text-xs text-green-400 font-mono">
+                      REFERRAL APPLIED
+                    </div>
+                  </div>
+                )}
                 {activeField === "referral" && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent"></div>
                 )}
@@ -310,18 +410,27 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Progress Bar Animation */}
-          {/*  */}
-
           {/* Submit Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            disabled={loading}
-            className="w-full py-4 px-6 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-mono font-bold rounded-lg hover:from-cyan-500 hover:to-blue-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+            disabled={loading || passwordStrength < 50}
+            className={`w-full py-4 px-6 text-white font-mono font-bold rounded-lg transition-all duration-300 relative overflow-hidden group ${
+              loading || passwordStrength < 50
+                ? "bg-gray-700 cursor-not-allowed opacity-50"
+                : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
+            }`}
           >
             {/* Button Glow */}
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-50 transition-opacity"></div>
+            
+            {/* Cyber Pattern Overlay */}
+            <div 
+              className="absolute inset-0 opacity-5"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
             
             {/* Button Text */}
             <span className="relative flex items-center justify-center">
@@ -330,6 +439,8 @@ export default function RegisterPage() {
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
                   REGISTERING
                 </>
+              ) : passwordStrength < 50 ? (
+                "STRENGTHEN PASSWORD"
               ) : (
                 "REGISTER"
               )}
@@ -351,15 +462,8 @@ export default function RegisterPage() {
           </p>
         </form>
 
-        {/* Terminal-like Footer */}
-        <div className="mt-6 p-4 bg-black/50 border border-cyan-500/20 rounded-lg font-mono text-xs text-cyan-400/70">
-          <div className="flex items-center">
-            <div className="text-green-400 mr-2">$</div>
-            <div className="animate-pulse">
-              Financial_Powerhouse_Network © 2024 | Secure_Connection_Established
-            </div>
-          </div>
-        </div>
+        {/* Security Footer */}
+        
       </motion.div>
 
       {/* Add CSS for grid animation */}

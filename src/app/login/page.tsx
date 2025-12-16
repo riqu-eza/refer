@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { FiEye, FiEyeOff } from "react-icons/fi"; // Add this import for icons
 
 export default function LoginPage() {
   const [form, setForm] = useState({
@@ -16,20 +17,19 @@ export default function LoginPage() {
   const [activeField, setActiveField] = useState<string | null>(null);
   const [hologramProgress, setHologramProgress] = useState(0);
   const [scanLine, setScanLine] = useState(0);
-  const [isClient, setIsClient] = useState(false); // ← Add this
+  const [showPassword, setShowPassword] = useState(false); // Correct variable name
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    setIsClient(true); // ← Set client flag on mount
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
-    // Cyber animation progress
     const progressInterval = setInterval(() => {
       setHologramProgress((prev) => (prev >= 100 ? 0 : prev + 1));
     }, 50);
 
-    // Scan line animation
     const scanInterval = setInterval(() => {
       setScanLine((prev) => (prev >= 100 ? 0 : prev + 10));
     }, 100);
@@ -40,10 +40,9 @@ export default function LoginPage() {
     };
   }, []);
 
-  // Generate stable binary characters
   const binaryCharacters = Array.from({ length: 50 }).map((_, i) => ({
-    char: i % 2 === 0 ? '1' : '0', // Stable pattern instead of random
-    left: `${(i * 3.8) % 100}%`, // Stable calculation instead of Math.random()
+    char: i % 2 === 0 ? '1' : '0',
+    left: `${(i * 3.8) % 100}%`,
   }));
 
   const handleChange = (e: any) => {
@@ -85,7 +84,7 @@ export default function LoginPage() {
     <div className="min-h-screen relative flex items-center justify-center bg-gray-950 p-6 overflow-hidden">
       {/* Cyber Matrix Background */}
       <div className="absolute inset-0">
-        {/* Binary Rain Effect - Only render on client */}
+        {/* Binary Rain Effect */}
         {isClient && (
           <div className="absolute inset-0 overflow-hidden">
             {binaryCharacters.map((item, i) => (
@@ -127,7 +126,7 @@ export default function LoginPage() {
           }}
         />
 
-        {/* Anime Cyber City Silhouette - Fixed values */}
+        {/* Anime Cyber City Silhouette */}
         <div className="absolute bottom-0 left-0 right-0 h-1/3 opacity-10">
           <div className="flex items-end h-full">
             {Array.from({ length: 20 }).map((_, i) => (
@@ -135,27 +134,12 @@ export default function LoginPage() {
                 key={i}
                 className="flex-1 bg-gradient-to-t from-cyan-500/30 to-transparent"
                 style={{
-                  height: `${30 + (i % 5) * 14}%`, // Deterministic height
+                  height: `${30 + (i % 5) * 14}%`,
                 }}
               />
             ))}
           </div>
         </div>
-
-        {/* Scan Line */}
-        {/* {isClient && (
-          <motion.div
-            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"
-            style={{ top: `${scanLine}%` }}
-            initial={{ top: 0 }}
-            animate={{ top: "100%" }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        )} */}
       </div>
 
       {/* Login Interface */}
@@ -183,8 +167,6 @@ export default function LoginPage() {
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-2">
               LOGIN
             </h1>
-            
-           
           </div>
 
           {/* Status Display */}
@@ -222,7 +204,7 @@ export default function LoginPage() {
                 required
                 value={form.identifier}
                 onChange={handleChange}
-                onFocus={() => setActiveField("email")}
+                onFocus={() => setActiveField("identifier")}
                 onBlur={() => setActiveField(null)}
                 className="relative w-full p-4 bg-gray-900/70 border border-cyan-500/20 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
                 placeholder="ENTER_CREDENTIALS"
@@ -239,24 +221,45 @@ export default function LoginPage() {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <label className="block text-sm font-mono text-cyan-400">
-              PASSWORD
-            </label>
+            <div className="flex justify-between items-center">
+              <label className="block text-sm font-mono text-cyan-400">
+                PASSWORD
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-mono flex items-center gap-1"
+              >
+                {showPassword ? (
+                  <>
+                    <FiEyeOff className="w-3 h-3" />
+                    HIDE
+                  </>
+                ) : (
+                  <>
+                    <FiEye className="w-3 h-3" />
+                    SHOW
+                  </>
+                )}
+              </button>
+            </div>
+            
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-transparent rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
               <input
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={form.password}
                 onChange={handleChange}
                 onFocus={() => setActiveField("password")}
                 onBlur={() => setActiveField(null)}
-                className="relative w-full p-4 bg-gray-900/70 border border-cyan-500/20 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
+                className="relative w-full p-4 pr-12 bg-gray-900/70 border border-cyan-500/20 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
                 placeholder="••••••••••••"
               />
+              
               {/* Security Level Indicator */}
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
                 <div className="flex items-center space-x-1">
                   {[1, 2, 3, 4].map((level) => (
                     <div
@@ -270,6 +273,7 @@ export default function LoginPage() {
                   ))}
                 </div>
               </div>
+              
               {activeField === "password" && (
                 <motion.div
                   initial={{ width: 0 }}
@@ -280,31 +284,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Holographic Progress Indicator */}
-          {/* <div className="space-y-2">
-            <div className="flex justify-between text-xs font-mono text-cyan-400/70">
-              <span>SYSTEM_INTEGRITY</span>
-              <span>{hologramProgress}%</span>
-            </div>
-            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500"
-                animate={{
-                  backgroundPosition: ['0% 0%', '200% 0%'],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                style={{
-                  width: `${hologramProgress}%`,
-                  backgroundSize: '200% 100%',
-                }}
-              />
-            </div>
-          </div> */}
-
           {/* Login Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -312,10 +291,8 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-4 px-6 bg-gradient-to-r from-cyan-700/30 to-blue-700/30 border border-cyan-500/50 text-white font-mono font-bold rounded-lg hover:border-cyan-400 hover:from-cyan-600/40 hover:to-blue-600/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
           >
-            {/* Animated Background */}
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             
-            {/* Cyber Pattern Overlay */}
             <div 
               className="absolute inset-0 opacity-10"
               style={{
@@ -323,7 +300,6 @@ export default function LoginPage() {
               }}
             />
             
-            {/* Button Content */}
             <div className="relative flex items-center justify-center space-x-3">
               {loading ? (
                 <>
@@ -354,23 +330,20 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-          <div className="text-center text-xs font-mono text-cyan-400/70">
-          <p>
-
           
+          {/* Forgot Password Link */}
+          <div className="text-center text-xs font-mono text-cyan-400/70">
             <Link
               href="/forgot"
-              className="hover:text-cyan-300 transition-colors"
+              className="hover:text-cyan-300 transition-colors group inline-block"
             >
-              Forgot Password?
-            </Link>
+              <span className="relative">
+                Forgot Password?
                 <span className="absolute left-0 right-0 -bottom-1 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform"></span>
-          </p>
+              </span>
+            </Link>
           </div>
         </form>
-
-        {/* System Status Footer */}
-       
       </motion.div>
     </div>
   );
