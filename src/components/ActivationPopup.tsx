@@ -123,9 +123,9 @@ useEffect(() => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                SYSTEM_ACTIVATION
+              ACCOUNT_ACTIVATION
               </h1>
-              <p className="text-sm text-cyan-400/70 font-mono">SECURE_PROTOCOL v3.2</p>
+              {/* <p className="text-sm text-cyan-400/70 font-mono">SECURE_PROTOCOL v3.2</p> */}
             </div>
           </div>
           {/* <button
@@ -385,7 +385,7 @@ useEffect(() => {
           <div className="pt-4 border-t border-cyan-500/20">
             <div className="flex items-center justify-center space-x-2 text-xs text-cyan-400/70 font-mono">
               <Shield className="w-3 h-3" />
-              <span>END_TO_END_ENCRYPTION • PCI_DSS_COMPLIANT • 256-BIT_SSL</span>
+              <span>END_TO_END_ENCRYPTION </span>
             </div>
           </div>
         </div>

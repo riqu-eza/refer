@@ -21,6 +21,8 @@ export interface IUser extends Document {
 
   xp: number;
   level: number;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -44,6 +46,8 @@ const UserSchema = new Schema<IUser>({
 
   xp: { type: Number, default: 0 },
   level: { type: Number, default: 1 },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
 });
 
 export default mongoose.models.User ||

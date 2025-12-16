@@ -126,7 +126,7 @@ export default function DashboardPage() {
 
       <div className="relative min-h-screen bg-transparent text-white pb-24">
         {/* Neon Scan Line */}
-        {isClient && (
+        {/* {isClient && (
           <motion.div
             className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent z-50"
             initial={{ top: 0 }}
@@ -137,7 +137,7 @@ export default function DashboardPage() {
               ease: "linear",
             }}
           />
-        )}
+        )} */}
 
         {/* Header */}
         <motion.header

@@ -155,7 +155,7 @@ export default function RegisterPage() {
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <div className="text-cyan-400 text-sm font-mono">
-              FINANCIAL NETWORK // REGISTRATION v1.0
+              REGISTRATION 
             </div>
           </div>
 
@@ -190,7 +190,7 @@ export default function RegisterPage() {
             {/* Name Field */}
             <div className="relative group">
               <label className="block text-sm font-mono text-cyan-400 mb-2">
-                FULL_NAME.EXE
+                FULL NAME
               </label>
               <div className="relative">
                 <input
@@ -212,7 +212,7 @@ export default function RegisterPage() {
             {/* Phone Field */}
             <div className="relative group">
               <label className="block text-sm font-mono text-cyan-400 mb-2">
-                PHONE_NUMBER.SYS
+                PHONE NUMBER
               </label>
               <div className="relative">
                 <input
@@ -234,7 +234,7 @@ export default function RegisterPage() {
             {/* Email Field */}
             <div className="md:col-span-2 relative group">
               <label className="block text-sm font-mono text-cyan-400 mb-2">
-                EMAIL_ADDRESS.DAT
+                EMAIL ADDRESS
               </label>
               <div className="relative">
                 <input
@@ -255,7 +255,7 @@ export default function RegisterPage() {
             {/* Password Field */}
             <div className="md:col-span-2 relative group">
               <label className="block text-sm font-mono text-cyan-400 mb-2">
-                PASSWORD_KEY.ENC
+                PASSWORD
               </label>
               <div className="relative">
                 <input
@@ -291,7 +291,7 @@ export default function RegisterPage() {
             {/* Referral Field */}
             <div className="md:col-span-2 relative group">
               <label className="block text-sm font-mono text-cyan-400 mb-2">
-                REFERRAL_CODE.OPT
+                REFERRAL CODE (optional)
               </label>
               <div className="relative">
                 <input
@@ -311,14 +311,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Progress Bar Animation */}
-          <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-              className="absolute h-full bg-gradient-to-r from-cyan-500 to-blue-500"
-              initial={{ width: "0%" }}
-              animate={{ width: `${hologramProgress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
+          {/*  */}
 
           {/* Submit Button */}
           <motion.button
@@ -335,17 +328,17 @@ export default function RegisterPage() {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                  INITIALIZING_ACCOUNT...
+                  REGISTERING
                 </>
               ) : (
-                "REGISTER_NOW"
+                "REGISTER"
               )}
             </span>
           </motion.button>
 
           {/* Login Link */}
           <p className="text-center text-gray-400 text-sm font-mono">
-            EXISTING_USER?{" "}
+            ALREADY HAVE AN ACCOUNT?{" "}
             <a
               className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors group"
               href="/login"

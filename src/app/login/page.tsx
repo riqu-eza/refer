@@ -3,10 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [form, setForm] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
 
@@ -142,7 +143,7 @@ export default function LoginPage() {
         </div>
 
         {/* Scan Line */}
-        {isClient && (
+        {/* {isClient && (
           <motion.div
             className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"
             style={{ top: `${scanLine}%` }}
@@ -154,7 +155,7 @@ export default function LoginPage() {
               ease: "linear",
             }}
           />
-        )}
+        )} */}
       </div>
 
       {/* Login Interface */}
@@ -180,14 +181,10 @@ export default function LoginPage() {
             </div>
             
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-2">
-              ACCESS TERMINAL
+              LOGIN
             </h1>
             
-            <div className="flex items-center justify-center space-x-2 text-cyan-400 font-mono text-sm">
-              <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-transparent"></div>
-              <span>FPSH-001</span>
-              <div className="w-16 h-1 bg-gradient-to-l from-cyan-500 to-transparent"></div>
-            </div>
+           
           </div>
 
           {/* Status Display */}
@@ -215,22 +212,22 @@ export default function LoginPage() {
           {/* Email Field */}
           <div className="space-y-2">
             <label className="block text-sm font-mono text-cyan-400">
-              USER_IDENTIFIER
+              EMAIL ADDRESS / PHONE NUMBER
             </label>
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-transparent rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
               <input
-                name="email"
+                name="identifier"
                 type="text"
                 required
-                value={form.email}
+                value={form.identifier}
                 onChange={handleChange}
                 onFocus={() => setActiveField("email")}
                 onBlur={() => setActiveField(null)}
                 className="relative w-full p-4 bg-gray-900/70 border border-cyan-500/20 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
                 placeholder="ENTER_CREDENTIALS"
               />
-              {activeField === "email" && (
+              {activeField === "identifier" && (
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: "100%" }}
@@ -243,7 +240,7 @@ export default function LoginPage() {
           {/* Password Field */}
           <div className="space-y-2">
             <label className="block text-sm font-mono text-cyan-400">
-              SECURITY_KEY
+              PASSWORD
             </label>
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-transparent rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
@@ -331,11 +328,11 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-cyan-300">AUTHENTICATING...</span>
+                  <span className="text-cyan-300">LOGGING</span>
                 </>
               ) : (
                 <>
-                  <span>INITIATE_LOGIN</span>
+                  <span>LOGIN</span>
                   <span className="text-cyan-300 animate-pulse">→</span>
                 </>
               )}
@@ -345,38 +342,35 @@ export default function LoginPage() {
           {/* Registration Link */}
           <div className="text-center pt-4 border-t border-cyan-500/20">
             <p className="text-gray-400 font-mono text-sm">
-              NEW_TO_NETWORK?{" "}
-              <a
+              New user  {" "}
+              <Link
                 href="/register"
                 className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors group"
               >
                 <span className="relative">
-                  REQUEST_ACCESS
+                  REGISTER HERE
                   <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </span>
-              </a>
+              </Link>
             </p>
+          </div>
+          <div className="text-center text-xs font-mono text-cyan-400/70">
+          <p>
+
+          
+            <Link
+              href="/forgot"
+              className="hover:text-cyan-300 transition-colors"
+            >
+              Forgot Password?
+            </Link>
+                <span className="absolute left-0 right-0 -bottom-1 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+          </p>
           </div>
         </form>
 
         {/* System Status Footer */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-6 p-4 bg-black/50 border border-cyan-500/20 rounded-lg font-mono text-xs"
-        >
-          <div className="flex items-center justify-between text-cyan-400/70">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>SECURE_CONNECTION_ACTIVE</span>
-            </div>
-            <div className="text-right">
-              <div className="text-cyan-300">v2.4.1</div>
-              <div className="text-cyan-400/50 text-xs">FPSH_CORE</div>
-            </div>
-          </div>
-        </motion.div>
+       
       </motion.div>
     </div>
   );
