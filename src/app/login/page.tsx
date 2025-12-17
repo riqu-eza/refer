@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FiEye, FiEyeOff } from "react-icons/fi"; // Add this import for icons
+import { useUser } from "@/src/context/UserContext";
 
 export default function LoginPage() {
   const [form, setForm] = useState({
@@ -20,7 +21,14 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false); // Correct variable name
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
+  const { user,  } = useUser();
 
+  useEffect(() => {
+    if (!loading && user) {
+      console.log("🔁 User already authenticated, redirecting to dashboard");
+      router.replace("/dashboard");
+    }
+  }, [user, loading, router]);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -41,7 +49,7 @@ export default function LoginPage() {
   }, []);
 
   const binaryCharacters = Array.from({ length: 50 }).map((_, i) => ({
-    char: i % 2 === 0 ? '1' : '0',
+    char: i % 2 === 0 ? "1" : "0",
     left: `${(i * 3.8) % 100}%`,
   }));
 
@@ -96,7 +104,7 @@ export default function LoginPage() {
                   y: -50,
                 }}
                 animate={{
-                  y: '100vh',
+                  y: "100vh",
                 }}
                 transition={{
                   duration: Math.random() * 10 + 5,
@@ -114,14 +122,14 @@ export default function LoginPage() {
         )}
 
         {/* Neon Grid */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             backgroundImage: `
               linear-gradient(90deg, transparent 49.5%, rgba(0, 255, 255, 0.1) 50%, transparent 50.5%),
               linear-gradient(0deg, transparent 49.5%, rgba(0, 255, 255, 0.1) 50%, transparent 50.5%)
             `,
-            backgroundSize: '60px 60px',
+            backgroundSize: "60px 60px",
             opacity: 0.3,
           }}
         />
@@ -163,7 +171,7 @@ export default function LoginPage() {
               <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
-            
+
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-2">
               LOGIN
             </h1>
@@ -173,7 +181,7 @@ export default function LoginPage() {
           {msg && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               className={`p-4 rounded-lg border ${
                 msg.includes("successful")
                   ? "border-green-500/30 bg-green-500/10"
@@ -181,10 +189,22 @@ export default function LoginPage() {
               }`}
             >
               <div className="flex items-start font-mono text-sm">
-                <span className={`mr-2 ${msg.includes("successful") ? "text-green-400" : "text-red-400"}`}>
+                <span
+                  className={`mr-2 ${
+                    msg.includes("successful")
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
                   {">"}
                 </span>
-                <span className={msg.includes("successful") ? "text-green-300" : "text-red-300"}>
+                <span
+                  className={
+                    msg.includes("successful")
+                      ? "text-green-300"
+                      : "text-red-300"
+                  }
+                >
                   {msg}
                 </span>
               </div>
@@ -243,7 +263,7 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
-            
+
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-transparent rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
               <input
@@ -257,7 +277,7 @@ export default function LoginPage() {
                 className="relative w-full p-4 pr-12 bg-gray-900/70 border border-cyan-500/20 rounded-lg text-white font-mono focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
                 placeholder="••••••••••••"
               />
-              
+
               {/* Security Level Indicator */}
               <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
                 <div className="flex items-center space-x-1">
@@ -273,7 +293,7 @@ export default function LoginPage() {
                   ))}
                 </div>
               </div>
-              
+
               {activeField === "password" && (
                 <motion.div
                   initial={{ width: 0 }}
@@ -292,14 +312,14 @@ export default function LoginPage() {
             className="w-full py-4 px-6 bg-gradient-to-r from-cyan-700/30 to-blue-700/30 border border-cyan-500/50 text-white font-mono font-bold rounded-lg hover:border-cyan-400 hover:from-cyan-600/40 hover:to-blue-600/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            
-            <div 
+
+            <div
               className="absolute inset-0 opacity-10"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
               }}
             />
-            
+
             <div className="relative flex items-center justify-center space-x-3">
               {loading ? (
                 <>
@@ -318,7 +338,7 @@ export default function LoginPage() {
           {/* Registration Link */}
           <div className="text-center pt-4 border-t border-cyan-500/20">
             <p className="text-gray-400 font-mono text-sm">
-              New user  {" "}
+              New user{" "}
               <Link
                 href="/register"
                 className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors group"
@@ -330,7 +350,7 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-          
+
           {/* Forgot Password Link */}
           <div className="text-center text-xs font-mono text-cyan-400/70">
             <Link

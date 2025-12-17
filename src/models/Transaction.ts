@@ -20,7 +20,7 @@ export interface ITransaction extends Document {
 
 const TransactionSchema = new Schema<ITransaction>({
   userId: { type: String, required: true, index: true },
-  type: { type: String, required: true },
+  type: { type: String, required: true , enum: ["DEPOSIT", "WITHDRAWAL",  "REWARD"]},
   amount: { type: Number, required: true },
   currency: { type: String, enum: ["FIAT", "POINTS"], required: true },
 
