@@ -31,6 +31,13 @@ export async function POST(req: Request) {
 
     // 4. Generate new referralCode
     const referralCode = generateReferralCode(phone);
+    // Prevent self-referral
+    if (referral && referral === referralCode) {
+      return NextResponse.json(
+        { error: "Invalid referral code" },
+        { status: 400 }
+      );
+    }
 
     // 5. Prepare user object
     const newUser = new User({
@@ -42,44 +49,52 @@ export async function POST(req: Request) {
       referredBy: referral || null,
     });
 
-    // 6. Handle referral logic if referral code provided
-    if (referral) {
-      // Tier 1 referrer
-      const tier1 = await User.findOne({ referralCode: referral });
+// 6. Handle referral logic if referral code provided
+if (referral) {
+  const tier1 = await User.findOne({ referralCode: referral });
 
-      if (tier1) {
-        // Add this user as Tier 1 for tier1 user
-        tier1.referralLevels.tier1.push(newUser._id.toString());
-        tier1.xp += 50; // XP reward
-        await tier1.save();
+  if (tier1) {
+    const newUserId = newUser._id.toString();
 
-        // Tier 2 referrer (referrer of the referrer)
-        if (tier1.referredBy) {
-          const tier2 = await User.findOne({
-            referralCode: tier1.referredBy,
+    // TIER 1
+    if (!tier1.referralLevels.tier1.includes(newUserId)) {
+      tier1.referralLevels.tier1.push(newUserId);
+      tier1.xp += 50;
+      await tier1.save();
+    }
+
+    // TIER 2
+    if (tier1.referredBy) {
+      const tier2 = await User.findOne({
+        referralCode: tier1.referredBy,
+      });
+
+      if (tier2) {
+        if (!tier2.referralLevels.tier2.includes(newUserId)) {
+          tier2.referralLevels.tier2.push(newUserId);
+          tier2.xp += 20;
+          await tier2.save();
+        }
+
+        // TIER 3
+        if (tier2.referredBy) {
+          const tier3 = await User.findOne({
+            referralCode: tier2.referredBy,
           });
 
-          if (tier2) {
-            tier2.referralLevels.tier2.push(newUser._id.toString());
-            tier2.xp += 20;
-            await tier2.save();
-
-            // Tier 3 referrer
-            if (tier2.referredBy) {
-              const tier3 = await User.findOne({
-                referralCode: tier2.referredBy,
-              });
-
-              if (tier3) {
-                tier3.referralLevels.tier3.push(newUser._id.toString());
-                tier3.xp += 10;
-                await tier3.save();
-              }
+          if (tier3) {
+            if (!tier3.referralLevels.tier3.includes(newUserId)) {
+              tier3.referralLevels.tier3.push(newUserId);
+              tier3.xp += 10;
+              await tier3.save();
             }
           }
         }
       }
     }
+  }
+}
+
 
     // 7. Save new user
     await newUser.save();

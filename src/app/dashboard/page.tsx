@@ -26,7 +26,7 @@ export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
   const [hologramScan, setHologramScan] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
-
+const [referralData, setReferralData] = useState([]);
   useEffect(() => {
     setIsClient(true);
 
@@ -56,6 +56,48 @@ export default function DashboardPage() {
     }
     loadBalance();
   }, [user]);
+
+  // Add to your state
+
+// Add to your useEffect to load referral data
+useEffect(() => {
+  async function loadReferralData() {
+    if (!user) return;
+    
+    try {
+      const res = await fetch(`/api/referrals/${user._id}`);
+      const data = await res.json();
+      
+      // Format data for display
+      const formattedData = [
+        {
+          tier: "TIER_1",
+          count: data.directReferrals?.length || 0,
+          users: data.directReferrals || [],
+          icon: <Users className="w-4 h-4 text-cyan-400" />
+        },
+        {
+          tier: "TIER_2",
+          count: data.tier2Referrals?.length || 0,
+          users: data.tier2Referrals || [],
+          icon: <Users className="w-4 h-4 text-emerald-400" />
+        },
+        {
+          tier: "TIER_3",
+          count: data.tier3Referrals?.length || 0,
+          users: data.tier3Referrals || [],
+          icon: <Users className="w-4 h-4 text-purple-400" />
+        }
+      ];
+      
+      setReferralData(formattedData);
+    } catch (error) {
+      console.error("Error loading referral data:", error);
+    }
+  }
+  
+  loadReferralData();
+}, [user]);
 
   if (loading) {
     return (
@@ -248,138 +290,232 @@ export default function DashboardPage() {
         {/* Main Content */}
         <div className="p-4 space-y-6">
           {/* Balance Card */}
+
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-gray-900/90 to-gray-900/50 backdrop-blur-sm p-6"
+            className="relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-gray-900/95 to-gray-900/70 backdrop-blur-lg p-4"
           >
-            {/* Glow Effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-cyan-500/20 blur-xl opacity-30"></div>
-
-            {/* Animated Circuit Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-transparent"></div>
-              <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-cyan-500 to-transparent"></div>
+            {/* Header */}
+            <div className="relative mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-cyan-400" />
+                  Financial Dashboard
+                </h2>
+                <div className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
+                  <span className="text-green-400">REALTIME</span>
+                </div>
+              </div>
+              
             </div>
 
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center">
-                    <Wallet className="w-6 h-6 text-cyan-400" />
+            {/* Metrics Grid - Vertical Stack */}
+            <div className="space-y-3">
+              {/* Wallet Balance */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                <div className="relative p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-cyan-500/20 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-600/30 to-blue-600/30 border border-cyan-500/30 flex items-center justify-center">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400"></div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-cyan-400/70">Wallet Balance</p>
+                      <p className="text-lg font-bold text-white">
+                        KSH {balance.fiat.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-cyan-400/70 font-mono">
-                      DIGITAL_ASSETS
-                    </p>
-                    <h2 className="text-2xl font-bold text-white">
-                      KSH {balance.fiat.toLocaleString()}
-                    </h2>
-                  </div>
-                </div>
-
-                {/* Status Indicator */}
-                <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-green-400 font-mono">
-                    ACTIVE
-                  </span>
+                  {/* <div className="text-xs px-2 py-1 rounded bg-cyan-500/10 text-cyan-300">
+                    LIQUID
+                  </div> */}
                 </div>
               </div>
 
-              {/* Points Display */}
-              <div className="flex items-center justify-between p-4 rounded-lg bg-gray-900/50 border border-cyan-500/20">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-600/20 to-amber-600/20 border border-yellow-500/30 flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-yellow-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-mono">
-                      ENERGY_POINTS
-                    </p>
-                    <p className="text-lg font-semibold text-yellow-300">
-                      {balance.points}
+              {/* Total Earned & Withdrawn - Side by side on mobile */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                  <div className="relative p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-600/30 to-green-600/30 border border-emerald-500/30 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+                      </div>
+                      <p className="text-xs text-emerald-400/70">
+                        Total Earned
+                      </p>
+                    </div>
+                    <p className="text-lg font-bold text-white">
+                      {balance.totalEarned?.toLocaleString() || "0"}
                     </p>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-32">
-                  <div className="flex justify-between text-xs text-gray-400 mb-1">
-                    <span>SYNC</span>
-                    <span>{Math.min(100, balance.points / 10)}%</span>
-                  </div>
-                  <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-yellow-500 to-amber-500"
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: `${Math.min(100, balance.points / 10)}%`,
-                      }}
-                      transition={{ duration: 1 }}
-                    />
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                  <div className="relative p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-amber-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-600/30 to-orange-600/30 border border-amber-500/30 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                      </div>
+                      <p className="text-xs text-amber-400/70">Withdrawn</p>
+                    </div>
+                    <p className="text-lg font-bold text-white">
+                      {balance.totalWithdrawn?.toLocaleString() || "0"}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Hologram Scan */}
-              {/* <div className="mt-6 pt-4 border-t border-cyan-500/20">
-                <div className="flex justify-between text-xs text-cyan-400/70 font-mono">
-                  <span>SYSTEM_INTEGRITY_SCAN</span>
-                  <span>{hologramScan}%</span>
+              {/* Total Experiences */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                <div className="relative p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-purple-500/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600/30 to-violet-600/30 border border-purple-500/30 flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-full bg-purple-400"></div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-purple-400/70">
+                          Expenses
+                        </p>
+                        <p className="text-lg font-bold text-white">
+                          {balance.totalExperiences || "0"}
+                        </p>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  
                 </div>
-                <div className="h-1 bg-gray-800 rounded-full overflow-hidden mt-1">
-                  <motion.div 
-                    className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500"
-                    animate={{ width: `${hologramScan}%` }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </div>
-              </div> */}
+              </div>
+              
             </div>
+
           </motion.div>
 
+             {/* Referral Section */}
+<motion.div
+  key="referrals"
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: -10 }}
+  className="space-y-4"
+>
+  {/* Referral Stats Card */}
+  <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/10 to-green-600/10 backdrop-blur-sm p-4">
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center space-x-3">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/30 flex items-center justify-center">
+          <Users className="w-5 h-5 text-emerald-400" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-emerald-300">REFERRAL NETWORK</h3>
+          <p className="text-sm text-emerald-400/70">Your network growth</p>
+        </div>
+      </div>
+      <div className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-500/30 text-emerald-400">
+        ACTIVE
+      </div>
+    </div>
+
+    {/* Referral Link Card */}
+    <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <p className="text-xs text-emerald-400/70 font-mono">REFERRAL_LINK</p>
+          <p className="text-sm text-gray-300 truncate max-w-[200px]">{referralLink}</p>
+        </div>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(referralLink);
+            // Add toast notification here
+          }}
+          className="px-3 py-2 text-xs bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-lg hover:from-emerald-500 hover:to-green-500 transition-all flex items-center gap-1"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          COPY
+        </button>
+      </div>
+      <p className="text-xs text-gray-400 mt-2">
+        Share this link. You earn rewards when referrals activate.
+      </p>
+    </div>
+
+    {/* Referral Stats */}
+    <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+        <p className="text-2xl font-bold text-emerald-300">{referralData.reduce((acc, item) => acc + item.count, 0)}</p>
+        <p className="text-xs text-emerald-400/70">Total</p>
+      </div>
+      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+        <p className="text-2xl font-bold text-emerald-300">
+          {referralData[0]?.users.filter(u => u.isActivated).length || 0}
+        </p>
+        <p className="text-xs text-emerald-400/70">Active</p>
+      </div>
+      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+        <p className="text-2xl font-bold text-emerald-300">
+          {referralData[0]?.users.filter(u => !u.isActivated).length || 0}
+        </p>
+        <p className="text-xs text-emerald-400/70">Pending</p>
+      </div>
+    </div>
+  </div>
+
+  {/* Referral Tiers */}
+  {referralData.map((item) => (
+    <div key={item.tier} className="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-gray-900/90 to-gray-900/50 backdrop-blur-sm p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-base font-bold text-white flex items-center space-x-2">
+          {item.icon}
+          <span>{item.tier}_REFERRALS</span>
+        </h3>
+        <div className="px-2 py-1 rounded text-xs font-mono bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 text-cyan-400">
+          {item.count}
+        </div>
+      </div>
+      
+      {item.users.length === 0 ? (
+        <div className="text-center py-6">
+          <Users className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">NO_{item.tier}_USERS_FOUND</p>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+          {item.users.map((user: any) => (
+            <div key={user._id} className="flex items-center justify-between p-2 rounded-lg bg-gray-900/30 hover:bg-gray-800/50 transition-colors">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center">
+                  <User className="w-3 h-3 text-cyan-400" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                  <p className="text-xs text-gray-400 truncate">{user.phone}</p>
+                </div>
+              </div>
+              <div className={`px-2 py-0.5 rounded text-xs font-mono ${
+                user.isActivated 
+                  ? "bg-green-500/20 text-green-400" 
+                  : "bg-yellow-500/20 text-yellow-400"
+              }`}>
+                {user.isActivated ? "ACTIVE" : "PENDING"}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ))}
+</motion.div> 
+            
+          
           {/* Quick Actions */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-4 gap-4"
-          >
-            <ActionButton
-              label="DEPOSIT"
-              link="/wallet/deposit"
-              icon={<ArrowUpRight className="w-6 h-6" />}
-              color="from-green-600/20 to-emerald-600/20"
-              border="border-green-500/30"
-              iconColor="text-green-400"
-            />
-            <ActionButton
-              label="WITHDRAW"
-              link="/wallet/withdraw"
-              icon={<ArrowDownRight className="w-6 h-6" />}
-              color="from-red-600/20 to-pink-600/20"
-              border="border-red-500/30"
-              iconColor="text-red-400"
-            />
-            <ActionButton
-              label="SPIN"
-              link="/spin"
-              icon={<Gift className="w-6 h-6" />}
-              color="from-purple-600/20 to-pink-600/20"
-              border="border-purple-500/30"
-              iconColor="text-purple-400"
-            />
-            <ActionButton
-              label="TASKS"
-              link="/tasks"
-              icon={<CheckSquare className="w-6 h-6" />}
-              color="from-blue-600/20 to-cyan-600/20"
-              border="border-blue-500/30"
-              iconColor="text-blue-400"
-            />
-          </motion.div>
 
           {/* Daily Spin CTA - Mobile Optimized */}
           <motion.div
@@ -416,58 +552,6 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Tasks Section - Mobile Optimized */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="space-y-3 sm:space-y-4"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
-                <div className="w-1.5 h-5 sm:w-2 sm:h-6 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full flex-shrink-0"></div>
-                <span className="whitespace-nowrap">MISSION_QUEUE</span>
-              </h3>
-              <a
-                href="/tasks"
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-mono transition-colors whitespace-nowrap flex-shrink-0 ml-2"
-              >
-                VIEW_ALL →
-              </a>
-            </div>
-
-            <div className="space-y-2">
-              <TaskCard
-                title="NEURAL_TRAINING"
-                subtitle="Watch YouTube Ad"
-                reward="20 POINTS"
-                rewardColor="text-cyan-400"
-                icon={
-                  <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse flex-shrink-0"></div>
-                }
-                mobile
-              />
-              <TaskCard
-                title="DATA_SURVEY"
-                subtitle="Take Quick Survey"
-                reward="KSH 15"
-                rewardColor="text-green-400"
-                icon={
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
-                }
-                mobile
-              />
-              <TaskCard
-                title="APP_TEST"
-                subtitle="Download App"
-                reward="KSH 30"
-                rewardColor="text-purple-400"
-                icon={
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse flex-shrink-0"></div>
-                }
-                mobile
-              />
-            </div>
-          </motion.div>
 
           {/* Referral CTA */}
         </div>
