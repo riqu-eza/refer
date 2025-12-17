@@ -184,7 +184,7 @@ useEffect(() => {
               >
                 <div className="text-center mb-6">
                   <p className="text-gray-300 mb-2">
-                    Activate your full account potential with a single secure payment
+                    Activate your account with only <span className="font-bold">99 KSH</span> and you start earning!
                   </p>
                   <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30">
                     <Shield className="w-4 h-4 text-cyan-400" />
