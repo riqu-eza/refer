@@ -21,8 +21,10 @@ import {
   Activity,
   Globe,
   Layers,
-  Sparkles
+  Sparkles,
+  LogOut,
 } from "lucide-react";
+import { useUser } from "@/src/context/UserContext";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
@@ -31,6 +33,7 @@ export default function ProfilePage() {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [scanProgress, setScanProgress] = useState(0);
+const { logout } = useUser();
 
   useEffect(() => {
     setIsClient(true);
@@ -138,10 +141,24 @@ export default function ProfilePage() {
               <p className="text-xs text-cyan-400/70 font-mono">SYSTEM_ID: {profile._id?.slice(-8) || "UNKNOWN"}</p>
             </div>
           </div>
+          <div className="flex items-center gap-2">
+  <a
+    href="/dashboard"
+    className="p-2 rounded-lg border border-cyan-500/20 hover:border-cyan-500/40 transition-colors"
+  >
+    <ChevronRight className="w-5 h-5 text-cyan-400 rotate-180" />
+  </a>
+
+  <button
+    onClick={logout}
+    className="p-2 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors"
+    title="Logout"
+  >
+    <LogOut className="w-5 h-5 text-red-400" />
+  </button>
+</div>
+
           
-          <a href="/dashboard" className="p-2 rounded-lg border border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
-            <ChevronRight className="w-5 h-5 text-cyan-400 rotate-180" />
-          </a>
         </header>
 
         {/* Main Content */}

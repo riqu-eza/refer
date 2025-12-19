@@ -10,7 +10,7 @@ import { initiateStkPush } from "@/src/services/mpesaService";
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-
+console.log("Connected to DB");
     const { phoneNumber, amount, userId } = await req.json();
     if (!phoneNumber || !amount || !userId) {
       return NextResponse.json(
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
+console.log("Received payment request:", { phoneNumber, amount, userId });
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });

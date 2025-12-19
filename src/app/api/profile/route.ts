@@ -18,9 +18,9 @@ export async function GET(req: Request) {
     }
 
     const decoded = await verifyToken(token);
-
+console.log("Decoded token:", decoded);
     // ✅ jose-style payload
-    const userId = decoded.payload.id;
+    const userId = decoded.id;
 
     if (!userId) {
       return NextResponse.json(

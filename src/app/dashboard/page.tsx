@@ -19,6 +19,7 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import LevelsComponent from "@/src/components/levels";
 
 export default function DashboardPage() {
   const { user, loading } = useUser();
@@ -26,7 +27,7 @@ export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
   const [hologramScan, setHologramScan] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
-const [referralData, setReferralData] = useState([]);
+  const [referralData, setReferralData] = useState([]);
   useEffect(() => {
     setIsClient(true);
 
@@ -59,45 +60,45 @@ const [referralData, setReferralData] = useState([]);
 
   // Add to your state
 
-// Add to your useEffect to load referral data
-useEffect(() => {
-  async function loadReferralData() {
-    if (!user) return;
-    
-    try {
-      const res = await fetch(`/api/referrals/${user._id}`);
-      const data = await res.json();
-      
-      // Format data for display
-      const formattedData = [
-        {
-          tier: "TIER_1",
-          count: data.directReferrals?.length || 0,
-          users: data.directReferrals || [],
-          icon: <Users className="w-4 h-4 text-cyan-400" />
-        },
-        {
-          tier: "TIER_2",
-          count: data.tier2Referrals?.length || 0,
-          users: data.tier2Referrals || [],
-          icon: <Users className="w-4 h-4 text-emerald-400" />
-        },
-        {
-          tier: "TIER_3",
-          count: data.tier3Referrals?.length || 0,
-          users: data.tier3Referrals || [],
-          icon: <Users className="w-4 h-4 text-purple-400" />
-        }
-      ];
-      
-      setReferralData(formattedData);
-    } catch (error) {
-      console.error("Error loading referral data:", error);
+  // Add to your useEffect to load referral data
+  useEffect(() => {
+    async function loadReferralData() {
+      if (!user) return;
+
+      try {
+        const res = await fetch(`/api/referrals/${user._id}`);
+        const data = await res.json();
+
+        // Format data for display
+        const formattedData = [
+          {
+            tier: "TIER_1",
+            count: data.directReferrals?.length || 0,
+            users: data.directReferrals || [],
+            icon: <Users className="w-4 h-4 text-cyan-400" />,
+          },
+          {
+            tier: "TIER_2",
+            count: data.tier2Referrals?.length || 0,
+            users: data.tier2Referrals || [],
+            icon: <Users className="w-4 h-4 text-emerald-400" />,
+          },
+          {
+            tier: "TIER_3",
+            count: data.tier3Referrals?.length || 0,
+            users: data.tier3Referrals || [],
+            icon: <Users className="w-4 h-4 text-purple-400" />,
+          },
+        ];
+
+        setReferralData(formattedData);
+      } catch (error) {
+        console.error("Error loading referral data:", error);
+      }
     }
-  }
-  
-  loadReferralData();
-}, [user]);
+
+    loadReferralData();
+  }, [user]);
 
   if (loading) {
     return (
@@ -308,7 +309,6 @@ useEffect(() => {
                   <span className="text-green-400">REALTIME</span>
                 </div>
               </div>
-              
             </div>
 
             {/* Metrics Grid - Vertical Stack */}
@@ -379,142 +379,175 @@ useEffect(() => {
                         <div className="w-4 h-4 rounded-full bg-purple-400"></div>
                       </div>
                       <div>
-                        <p className="text-xs text-purple-400/70">
-                          Expenses
-                        </p>
+                        <p className="text-xs text-purple-400/70">Expenses</p>
                         <p className="text-lg font-bold text-white">
                           {balance.totalExperiences || "0"}
                         </p>
                       </div>
                     </div>
-                    
                   </div>
-                  
                 </div>
               </div>
-              
             </div>
-
           </motion.div>
 
-             {/* Referral Section */}
-<motion.div
-  key="referrals"
-  initial={{ opacity: 0, y: 10 }}
-  animate={{ opacity: 1, y: 0 }}
-  exit={{ opacity: 0, y: -10 }}
-  className="space-y-4"
->
-  {/* Referral Stats Card */}
-  <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/10 to-green-600/10 backdrop-blur-sm p-4">
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/30 flex items-center justify-center">
-          <Users className="w-5 h-5 text-emerald-400" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-emerald-300">REFERRAL NETWORK</h3>
-          <p className="text-sm text-emerald-400/70">Your network growth</p>
-        </div>
-      </div>
-      <div className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-500/30 text-emerald-400">
-        ACTIVE
-      </div>
-    </div>
-
-    {/* Referral Link Card */}
-    <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <p className="text-xs text-emerald-400/70 font-mono">REFERRAL_LINK</p>
-          <p className="text-sm text-gray-300 truncate max-w-[200px]">{referralLink}</p>
-        </div>
-        <button
-          onClick={() => {
-            navigator.clipboard.writeText(referralLink);
-            // Add toast notification here
-          }}
-          className="px-3 py-2 text-xs bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-lg hover:from-emerald-500 hover:to-green-500 transition-all flex items-center gap-1"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          COPY
-        </button>
-      </div>
-      <p className="text-xs text-gray-400 mt-2">
-        Share this link. You earn rewards when referrals activate.
-      </p>
-    </div>
-
-    {/* Referral Stats */}
-    <div className="grid grid-cols-3 gap-2 mb-4">
-      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
-        <p className="text-2xl font-bold text-emerald-300">{referralData.reduce((acc, item) => acc + item.count, 0)}</p>
-        <p className="text-xs text-emerald-400/70">Total</p>
-      </div>
-      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
-        <p className="text-2xl font-bold text-emerald-300">
-          {referralData[0]?.users.filter(u => u.isActivated).length || 0}
-        </p>
-        <p className="text-xs text-emerald-400/70">Active</p>
-      </div>
-      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
-        <p className="text-2xl font-bold text-emerald-300">
-          {referralData[0]?.users.filter(u => !u.isActivated).length || 0}
-        </p>
-        <p className="text-xs text-emerald-400/70">Pending</p>
-      </div>
-    </div>
-  </div>
-
-  {/* Referral Tiers */}
-  {referralData.map((item) => (
-    <div key={item.tier} className="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-gray-900/90 to-gray-900/50 backdrop-blur-sm p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-bold text-white flex items-center space-x-2">
-          {item.icon}
-          <span>{item.tier}_REFERRALS</span>
-        </h3>
-        <div className="px-2 py-1 rounded text-xs font-mono bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 text-cyan-400">
-          {item.count}
-        </div>
-      </div>
-      
-      {item.users.length === 0 ? (
-        <div className="text-center py-6">
-          <Users className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">NO_{item.tier}_USERS_FOUND</p>
-        </div>
-      ) : (
-        <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-          {item.users.map((user: any) => (
-            <div key={user._id} className="flex items-center justify-between p-2 rounded-lg bg-gray-900/30 hover:bg-gray-800/50 transition-colors">
-              <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center">
-                  <User className="w-3 h-3 text-cyan-400" />
+          {/* Referral Section */}
+          <motion.div
+            key="referrals"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-4"
+          >
+            {/* Referral Stats Card */}
+            <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/10 to-green-600/10 backdrop-blur-sm p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/30 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-emerald-300">
+                      REFERRAL NETWORK
+                    </h3>
+                    <p className="text-sm text-emerald-400/70">
+                      Your network growth
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{user.phone}</p>
+                <div className="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-500/30 text-emerald-400">
+                  ACTIVE
                 </div>
               </div>
-              <div className={`px-2 py-0.5 rounded text-xs font-mono ${
-                user.isActivated 
-                  ? "bg-green-500/20 text-green-400" 
-                  : "bg-yellow-500/20 text-yellow-400"
-              }`}>
-                {user.isActivated ? "ACTIVE" : "PENDING"}
+
+              {/* Referral Link Card */}
+              <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="text-xs text-emerald-400/70 font-mono">
+                      REFERRAL_LINK
+                    </p>
+                    <p className="text-sm text-gray-300 truncate max-w-[200px]">
+                      {referralLink}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(referralLink);
+                      // Add toast notification here
+                    }}
+                    className="px-3 py-2 text-xs bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-lg hover:from-emerald-500 hover:to-green-500 transition-all flex items-center gap-1"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                    COPY
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">
+                  Share this link. You earn rewards when referrals activate.
+                </p>
+              </div>
+
+              {/* Referral Stats */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+                  <p className="text-2xl font-bold text-emerald-300">
+                    {referralData.reduce((acc, item) => acc + item.count, 0)}
+                  </p>
+                  <p className="text-xs text-emerald-400/70">Total</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+                  <p className="text-2xl font-bold text-emerald-300">
+                    {referralData[0]?.users.filter((u) => u.isActivated)
+                      .length || 0}
+                  </p>
+                  <p className="text-xs text-emerald-400/70">Active</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
+                  <p className="text-2xl font-bold text-emerald-300">
+                    {referralData[0]?.users.filter((u) => !u.isActivated)
+                      .length || 0}
+                  </p>
+                  <p className="text-xs text-emerald-400/70">Pending</p>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  ))}
-</motion.div> 
-            
-          
+
+            {/* Referral Tiers */}
+            {/* {referralData.map((item) => (
+              <div
+                key={item.tier}
+                className="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-gray-900/90 to-gray-900/50 backdrop-blur-sm p-4"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-bold text-white flex items-center space-x-2">
+                    {item.icon}
+                    <span>{item.tier}_REFERRALS</span>
+                  </h3>
+                  <div className="px-2 py-1 rounded text-xs font-mono bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 text-cyan-400">
+                    {item.count}
+                  </div>
+                </div>
+
+                {item.users.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Users className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">
+                      NO_{item.tier}_USERS_FOUND
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                    {item.users.map((user: any) => (
+                      <div
+                        key={user._id}
+                        className="flex items-center justify-between p-2 rounded-lg bg-gray-900/30 hover:bg-gray-800/50 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center">
+                            <User className="w-3 h-3 text-cyan-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-white truncate">
+                              {user.name}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate">
+                              {user.phone}
+                            </p>
+                          </div>
+                        </div>
+                        <div
+                          className={`px-2 py-0.5 rounded text-xs font-mono ${
+                            user.isActivated
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-yellow-500/20 text-yellow-400"
+                          }`}
+                        >
+                          {user.isActivated ? "ACTIVE" : "PENDING"}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))} */}
+          </motion.div>
+<motion.div>
+  <div className="flex items-center justify-between mb-3">
+    <LevelsComponent />
+  </div>
+</motion.div>
           {/* Quick Actions */}
 
           {/* Daily Spin CTA - Mobile Optimized */}

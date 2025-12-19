@@ -58,7 +58,7 @@ useEffect(() => {
     setMsg("");
     setActiveStep(2);
 
-    const res = await fetch("/api/mpesa/stkpush", {
+    const res = await fetch("/api/payments/activation", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -369,12 +369,7 @@ useEffect(() => {
                       </button>
                     )}
                     
-                    <button
-                      onClick={closePopup}
-                      className="flex-1 py-3 px-4 bg-gradient-to-r from-gray-700 to-gray-800 text-white font-bold rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all border border-gray-600"
-                    >
-                      CLOSE
-                    </button>
+                   /
                   </div>
                 </div>
               </motion.div>

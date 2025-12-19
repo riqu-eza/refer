@@ -20,7 +20,7 @@ export interface IUser extends Document {
   };
 
   xp: number;
-  level: number;
+  level: "bronze" | "silver" | "gold" | "platinum";
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
 }
@@ -45,7 +45,12 @@ const UserSchema = new Schema<IUser>({
   },
 
   xp: { type: Number, default: 0 },
-  level: { type: Number, default: 1 },
+  level: {
+  type: String,
+  enum: ["bronze", "silver", "gold", "platinum"],
+  default: "bronze",
+},
+
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
 });

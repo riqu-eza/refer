@@ -33,11 +33,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initial load
-  useEffect(() => {
-    loadUser();
-  }, []);
-
   // Extracted into a function so we can reuse it
   const loadUser = async () => {
     console.log("➡️ UserContext: calling /api/auth/me");
@@ -61,6 +56,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(false);
   };
+
+  // Initial load
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadUser();
+  }, []);
 
   // NEW: function to manually refresh user anytime
   const refreshUser = async () => {

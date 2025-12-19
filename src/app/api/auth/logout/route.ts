@@ -1,12 +1,16 @@
-export const runtime = "nodejs";
-
+// src/app/api/auth/logout/route.ts
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-
 
 export async function POST() {
-  const cookieStore = await cookies();
-  cookieStore.delete("session_token");
+  const res = NextResponse.json({ message: "Logged out" });
 
-  return NextResponse.json({ message: "Logged out" });
+  res.cookies.set("session_token", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    expires: new Date(0),
+    path: "/",
+  });
+
+  return res;
 }

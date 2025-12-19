@@ -6,12 +6,15 @@ import User from "@/src/models/User";
 
 export async function GET(
   req: Request,
-  { params }: { params: { userId: string } }
+  context: { params: Promise<{ userId: string }> }
 ) {
   await connectDB();
 
   try {
-    const user = await User.findById(params.userId).lean();
+    // ✅ Await params
+    const { userId } = await context.params;
+
+    const user = await User.findById(userId).lean();
 
     if (!user) {
       return NextResponse.json(
@@ -22,7 +25,6 @@ export async function GET(
 
     const { referralLevels } = user;
 
-    // Fetch users by tiers
     const [tier1, tier2, tier3] = await Promise.all([
       User.find({ _id: { $in: referralLevels?.tier1 || [] } })
         .select("name phone isActivated")

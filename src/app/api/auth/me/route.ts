@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { connectDB } from "@/src/lib/db";
 import User from "@/src/models/User";
-import { verifyToken } from "@/src/lib/jwt";
+import { verifyJWT } from "@/src/lib/jwt";
 
 export async function GET() {
   console.log("➡️ /api/auth/me called");
@@ -19,7 +19,7 @@ export async function GET() {
 
     let decoded;
     try {
-      decoded = await verifyToken(token);
+      decoded = await verifyJWT(token);
       console.log("🔓 JWT Decoded:", decoded.payload);
     } catch (err) {
       console.error("❌ JWT VERIFY FAILED:", err);

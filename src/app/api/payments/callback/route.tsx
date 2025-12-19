@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/src/lib/db";
 import Transaction from "@/src/models/Transaction";
@@ -43,10 +44,13 @@ export async function POST(req: NextRequest) {
 
     // 4️⃣ Detect duplicate callbacks
     if (tx.status !== "PENDING") {
-      console.log("MPESA-CALLBACK | DUPLICATE | Transaction already processed", {
-        checkoutRequestID,
-        status: tx.status,
-      });
+      console.log(
+        "MPESA-CALLBACK | DUPLICATE | Transaction already processed",
+        {
+          checkoutRequestID,
+          status: tx.status,
+        }
+      );
       return NextResponse.json({ ok: true });
     }
 
@@ -67,7 +71,9 @@ export async function POST(req: NextRequest) {
     // 6️⃣ Extract metadata from callback
     const metadata = callback.CallbackMetadata?.Item || [];
     const amount = metadata.find((i: any) => i.Name === "Amount")?.Value;
-    const receipt = metadata.find((i: any) => i.Name === "MpesaReceiptNumber")?.Value;
+    const receipt = metadata.find(
+      (i: any) => i.Name === "MpesaReceiptNumber"
+    )?.Value;
     const phone = metadata.find((i: any) => i.Name === "PhoneNumber")?.Value;
     const date = metadata.find((i: any) => i.Name === "TransactionDate")?.Value;
 
@@ -83,7 +89,9 @@ export async function POST(req: NextRequest) {
     tx.receiptNumber = receipt;
     tx.paidPhoneNumber = phone?.toString();
     tx.paidAt = new Date(
-      `${date.toString().slice(0, 4)}-${date.toString().slice(4, 6)}-${date.toString().slice(6, 8)}
+      `${date.toString().slice(0, 4)}-${date.toString().slice(4, 6)}-${date
+        .toString()
+        .slice(6, 8)}
        ${date.toString().slice(8, 10)}:${date.toString().slice(10, 12)}:${date
         .toString()
         .slice(12, 14)}`
@@ -120,16 +128,42 @@ export async function POST(req: NextRequest) {
         balance: newWallet.fiatBalance,
       });
     }
-     if(tx.type === "ACTIVATION"){
+    if (tx.type === "ACTIVATION") {
       const user = await User.findById(tx.userId);
-      if(user && !user.isActivated){
+      if (user && !user.isActivated) {
         user.isActivated = true;
         await user.save();
         console.log("MPESA-CALLBACK | User activated:", {
           userId: tx.userId,
         });
       }
-     }
+    }
+    if (tx.type === "LEVEL_UPGRADE") {
+      const user = await User.findById(tx.userId);
+
+      if (!user) {
+        console.error("LEVEL-UPGRADE | User not found", tx.userId);
+        return NextResponse.json({ ok: true });
+      }
+
+      const targetLevel = tx.meta?.targetLevel;
+
+      if (!targetLevel || targetLevel <= user.level) {
+        console.warn("LEVEL-UPGRADE | Invalid target level", {
+          current: user.level,
+          targetLevel,
+        });
+        return NextResponse.json({ ok: true });
+      }
+
+      user.level = targetLevel;
+      await user.save();
+
+      console.log("LEVEL-UPGRADE | User upgraded", {
+        userId: user._id,
+        newLevel: user.level,
+      });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error: any) {
