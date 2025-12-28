@@ -216,7 +216,7 @@ useEffect(() => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-400">ACTIVATION_FEE</p>
-                      <p className="text-2xl font-bold text-cyan-300">KSH 50</p>
+                      <p className="text-2xl font-bold text-cyan-300">KSH 99</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-400">ACCOUNT_LEVEL</p>
