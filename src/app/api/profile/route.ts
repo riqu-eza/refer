@@ -17,10 +17,17 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const decoded = await verifyToken(token);
+const decoded = await verifyToken(token);
 console.log("Decoded token:", decoded);
-    // ✅ jose-style payload
-    const userId = decoded.id;
+// ✅ jose-style payload
+if (!decoded || !decoded.id) {
+  return NextResponse.json(
+    { error: "Invalid token payload" },
+    { status: 401 }
+  );
+}
+
+const userId = decoded.id;
 
     if (!userId) {
       return NextResponse.json(

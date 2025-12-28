@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { WHEEL_SEGMENTS } from "@/src/config/Wheel";
@@ -80,6 +82,18 @@ interface WalletData {
   pointsBalance: number;
   fiatBalance: number;
 }
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  return isMobile;
+}
 
 export default function ResponsiveSpinWheel() {
   // State Management
@@ -100,7 +114,8 @@ export default function ResponsiveSpinWheel() {
   const [showHistory, setShowHistory] = useState(false);
   const [showLevels, setShowLevels] = useState(false);
   const [showMobileStats, setShowMobileStats] = useState(false);
-  
+  const isMobile = useIsMobile();
+
   // Refs
   const wheelRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
@@ -747,13 +762,14 @@ export default function ResponsiveSpinWheel() {
                       <div className="absolute bottom-4 md:bottom-6 right-4 md:right-6 transform -rotate-45">
                         <div className="flex flex-col items-center">
                           <div className="mb-1 p-1 md:p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
-                            {getSegmentIcon(seg.type, window.innerWidth < 768 ? "xs" : "sm")}
+                          {getSegmentIcon(seg.type, (typeof window !== "undefined" && window.innerWidth < 768) ? "xs" : "sm")}
+
                           </div>
                           <span className="text-[9px] md:text-xs font-bold text-white drop-shadow-lg whitespace-nowrap">
                             {seg.label}
                           </span>
                           <span className="text-[8px] md:text-[10px] font-bold text-white/90">
-                            {seg.value}
+                            {seg.label}
                           </span>
                         </div>
                       </div>

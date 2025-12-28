@@ -5,7 +5,7 @@ import { verifyToken } from "@/src/lib/jwt";
 
 export async function POST(req: NextRequest) {
   const token = req.cookies.get("session_token")?.value;
-  const user = verifyToken(token);
+  const user = await verifyToken(token);
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -20,6 +20,10 @@ export async function GET() {
     let decoded;
     try {
       decoded = await verifyJWT(token);
+      if (!decoded) {
+        console.error("❌ JWT VERIFY RETURNED NULL");
+        return NextResponse.json({ user: null });
+      }
       console.log("🔓 JWT Decoded:", decoded.payload);
     } catch (err) {
       console.error("❌ JWT VERIFY FAILED:", err);

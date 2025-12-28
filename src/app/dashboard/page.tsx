@@ -2,7 +2,7 @@
 
 import ActivationPopup from "@/src/components/ActivationPopup";
 import { useUser } from "@/src/context/UserContext";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowUpRight,
@@ -21,13 +21,41 @@ import {
 import Link from "next/link";
 import LevelsComponent from "@/src/components/levels";
 
+interface Balance {
+  fiat: number;
+  points: number;
+  totalEarned: number;
+  totalWithdrawn: number;
+  totalExperiences: number;
+}
+
+interface ReferralUser {
+  _id: string;
+  name?: string;
+  phone?: string;
+  isActivated: boolean;
+}
+interface ReferralItem {
+  tier: string;
+  count: number;
+  users: ReferralUser[];
+  icon: JSX.Element;
+}
+
 export default function DashboardPage() {
   const { user, loading } = useUser();
-  const [balance, setBalance] = useState({ fiat: 0, points: 0 });
+  const [balance, setBalance] = useState<Balance>({
+    fiat: 0,
+    points: 0,
+    totalEarned: 0,
+    totalWithdrawn: 0,
+    totalExperiences: 0,
+  });
   const [isClient, setIsClient] = useState(false);
   const [hologramScan, setHologramScan] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
-  const [referralData, setReferralData] = useState([]);
+  const [referralData, setReferralData] = useState<any[]>([]);
+
   useEffect(() => {
     setIsClient(true);
 
@@ -50,9 +78,13 @@ export default function DashboardPage() {
       const res = await fetch(`/api/wallet/${user._id}`);
       const data = await res.json();
       setBalance({
-        fiat: data.fiatBalance ?? 0,
-        points: data.pointsBalance ?? 0,
-      });
+  fiat: data.fiatBalance ?? 0,
+  points: data.pointsBalance ?? 0,
+  totalEarned: data.totalEarned ?? 0,
+  totalWithdrawn: data.totalWithdrawn ?? 0,
+  totalExperiences: data.totalExperiences ?? 0,
+});
+
       console.log("Wallet data loaded:", data);
     }
     loadBalance();
@@ -469,14 +501,14 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
                   <p className="text-2xl font-bold text-emerald-300">
-                    {referralData[0]?.users.filter((u) => u.isActivated)
+                    {referralData[0]?.users.filter((u: ReferralUser) => u.isActivated)
                       .length || 0}
                   </p>
                   <p className="text-xs text-emerald-400/70">Active</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 border border-emerald-500/20">
                   <p className="text-2xl font-bold text-emerald-300">
-                    {referralData[0]?.users.filter((u) => !u.isActivated)
+                    {referralData[0]?.users.filter((u: { isActivated: any; }) => !u.isActivated)
                       .length || 0}
                   </p>
                   <p className="text-xs text-emerald-400/70">Pending</p>

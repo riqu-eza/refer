@@ -1,11 +1,11 @@
 // src/app/api/spin/status/route.ts
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { verifyToken } from "@/src/lib/jwt";
 import SpinState from "@/src/models/SpinState";
 import { LEVEL_SPINS } from "@/src/config/spinConfig";
 import { LEVEL_TO_NUMBER } from "@/src/lib/levelUtils";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const token = req.cookies.get("session_token")?.value;
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -13,10 +13,23 @@ export async function GET(req: Request) {
 
   const user = await verifyToken(token);
 
-  // 🔁 Convert level string → numeric level
-  const levelNumber = LEVEL_TO_NUMBER[user.level];
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  if (!levelNumber) {
+  // 🔁 Convert level string → numeric level
+  if (typeof user.level !== "string") {
+    console.error("Invalid user level type:", typeof user.level);
+    return NextResponse.json(
+      { error: "Invalid user level configuration" },
+      { status: 500 }
+    );
+  }
+
+  const levelKey = user.level as keyof typeof LEVEL_TO_NUMBER;
+  const levelNumber = LEVEL_TO_NUMBER[levelKey];
+
+  if (levelNumber == null) {
     console.error("Invalid user level:", user.level);
     return NextResponse.json(
       { error: "Invalid user level configuration" },

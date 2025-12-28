@@ -24,6 +24,10 @@ export async function POST(req: NextRequest) {
   }
 
   const payload = await verifyToken(token);
+  // If verifyToken returns null or doesn't include an id, reject as unauthorized
+  if (!payload || !("id" in payload) || !payload.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   console.log("Payload:", payload);
   const userId = payload.id;
   // const userId = req.cookies.get("user_id")?.value;

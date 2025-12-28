@@ -14,6 +14,10 @@ export async function POST(req: NextRequest) {
 
     const userInfo = await verifyToken(token);
     console.log("👤 Token decoded user:", userInfo);
+    if (!userInfo || !userInfo.id) {
+      console.warn("⛔ Unauthorized spin attempt - invalid token data");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const user = await User.findById(userInfo.id); // Fetch full user details
     if (!user) {
       console.warn("⛔ Unauthorized spin attempt");

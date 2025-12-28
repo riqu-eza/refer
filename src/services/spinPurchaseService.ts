@@ -1,4 +1,4 @@
-import { LEVEL_CONFIG } from "../config/levels";
+import { LEVEL_CONFIG, LevelId } from "../config/levels";
 import Transaction from "../models/Transaction";
 import User from "../models/User";
 import UserSpinState from "../models/UserSpinState";
@@ -9,8 +9,16 @@ export async function buyExtraSpin(userId: string) {
   const wallet = await Wallet.findOne({ userId });
   const spinState = await UserSpinState.findOne({ userId });
 
-  const cost = LEVEL_CONFIG[user.level].spinCostPoints;
-  if (wallet.pointsBalance < cost) throw new Error("Insufficient points");
+  if (!user || !wallet || !spinState) {
+    throw new Error("Missing user or wallet data");
+  }
+
+  const levelKey = user.level as LevelId;
+  const cost = LEVEL_CONFIG[levelKey].spinCostPoints;
+
+  if (wallet.pointsBalance < cost) {
+    throw new Error("Insufficient points");
+  }
 
   wallet.pointsBalance -= cost;
   spinState.extraSpins += 1;

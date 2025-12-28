@@ -11,6 +11,8 @@ interface IUser {
   referredBy?: string;
   createdAt: string;
   isActivated: boolean;
+
+  level: string;
 }
 
 interface UserContextType {
